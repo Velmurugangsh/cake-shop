@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import ProductCard from "../components/ProductCard";
+import ProductPopup from "../components/ProductPopup";
 
-const cakes = [
+/* Your exact cake list */
+const CAKES = [
   { id: 1, name: "Chocolate Truffle", price: 450, img: "/images/cake14.jpeg", desc: "Rich chocolate layers with silky truffle cream." },
   { id: 2, name: "Red Velvet", price: 550, img: "/images/cake3.jpg", desc: "Classic red velvet with smooth cream cheese frosting." },
   { id: 3, name: "Rose Pistachio", price: 600, img: "/images/cake8.jpeg", desc: "Fragrant rose cake topped with roasted pistachios." },
@@ -18,58 +21,25 @@ const cakes = [
 ];
 
 export default function Shop({ addToCart }) {
-  const [popup, setPopup] = useState(null);
+  const [selected, setSelected] = useState(null);
 
   return (
-    <div className="shop-page">
-      <h1 className="title">Our Premium Cakes</h1>
+    <section className="shop page">
+      <h2 className="page-title">Our Cakes</h2>
 
-      <div className="cake-grid">
-        {cakes.map((cake) => (
-          <div key={cake.id} className="cake-card">
-
-            {/* IMAGE → Square */}
-            <div className="img-box" onClick={() => setPopup(cake)}>
-              <img src={cake.img} alt={cake.name} />
-            </div>
-
-            <h3>{cake.name}</h3>
-            <p className="price">₹{cake.price}</p>
-
-            {/* ADD TO CART BUTTON */}
-            <button
-              className="add-btn"
-              onClick={() => addToCart(cake)}
-            >
-              Add to Cart
-            </button>
-          </div>
+      <div className="shop-grid">
+        {CAKES.map((c) => (
+          <ProductCard
+            key={c.id}
+            cake={c}
+            onDetails={(cake) => setSelected(cake)}
+            onAdd={(cake) => addToCart && addToCart(cake)}
+          />
         ))}
       </div>
 
-      {/* POPUP */}
-      {popup && (
-        <div className="popup-bg" onClick={() => setPopup(null)}>
-          <div className="popup-card" onClick={(e) => e.stopPropagation()}>
-            <img src={popup.img} alt="" className="popup-img" />
-            <h2>{popup.name}</h2>
-            <p>{popup.desc}</p>
-            <p className="price">Price: ₹{popup.price}</p>
-
-            <button
-              className="add-btn"
-              onClick={() => { addToCart(popup); setPopup(null); }}
-            >
-              Add to Cart
-            </button>
-
-            <button className="close-btn" onClick={() => setPopup(null)}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      <ProductPopup cake={selected} onClose={() => setSelected(null)} onAdd={(cake)=> addToCart && addToCart(cake)} />
+    </section>
   );
 }
 
