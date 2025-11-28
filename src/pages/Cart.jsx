@@ -1,53 +1,74 @@
-import React from "react";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Cart({ cart, increaseQty, decreaseQty, removeItem }) {
-  const total = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+export default function Cart({ cart = [], increaseQty, decreaseQty, removeItem, clearCart }) {
+  const navigate = useNavigate();
+  const [payment, setPayment] = useState("");
+
+  const total = cart.reduce((s,i) => s + i.price * i.qty, 0);
+
+  const proceed = () => {
+    if (cart.length === 0) { alert("Cart is empty"); return; }
+    if (!payment) { alert("Select a payment method"); return; }
+    // proceed to checkout
+    navigate("/checkout", { state: { payment } });
+  };
 
   return (
-    <div className="cart-page">
-      <h1 className="title">Your Cart</h1>
+    <section className="cart page">
+      <h2 className="page-title">Your Cart</h2>
 
-      {cart.length === 0 ? (
-        <p className="empty">Your cart is empty!</p>
-      ) : (
-        <div className="cart-items">
-          {cart.map((item) => (
-            <div key={item.id} className="cart-card">
-              <img src={item.img} alt={item.name} />
-
-              <div className="info">
-                <h2>{item.name}</h2>
-                <p>₹{item.price}</p>
-
-                <div className="qty-box">
-                  <button onClick={() => decreaseQty(item.id)}>-</button>
-                  <span>{item.qty}</span>
-                  <button onClick={() => increaseQty(item.id)}>+</button>
-                </div>
-
-                <button className="remove-btn" onClick={() => removeItem(item.id)}>
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))}
-
-          <div className="payment-box">
-            <h2>Total: ₹{total}</h2>
-
-            <h3>Select Payment Option:</h3>
-
-            <label>
-              <input type="radio" name="pay" /> Google Pay (GPay)
-            </label>
-            <label>
-              <input type="radio" name="pay" /> Cash on Delivery
-            </label>
-
-            <button className="checkout-btn">Proceed to Checkout</button>
+      <div className="cart-container card">
+        {cart.length === 0 ? (
+          <div className="empty">
+            <p>Your cart is empty.</p>
+            <Link to="/shop" className="btn">Shop Cakes</Link>
           </div>
-        </div>
-      )}
-    </div>
+        ) : (
+          <div className="cart-grid">
+            <div className="cart-list">
+              {cart.map(item => (
+                <div className="cart-item" key={item.id}>
+                  <img src={item.img} alt={item.name} />
+                  <div className="cart-details">
+                    <h4>{item.name}</h4>
+                    <div className="muted">₹{item.price} each</div>
+
+                    <div className="cart-controls">
+                      <div className="cart-qty-buttons">
+                        <button className="qty-btn" onClick={() => decreaseQty(item.id)}>-</button>
+                        <span style={{margin: "0 8px"}}>{item.qty}</span>
+                        <button className="qty-btn" onClick={() => increaseQty(item.id)}>+</button>
+                      </div>
+                      <button className="btn btn-sm" onClick={() => removeItem(item.id)} style={{marginLeft:12}}>Remove</button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <aside className="cart-summary">
+              <h3>Order Summary</h3>
+              <p>Items: {cart.reduce((s,i)=>s+i.qty,0)}</p>
+              <div className="cart-total"><strong>Total: ₹{total}</strong></div>
+
+              <div className="payment-box">
+                <label className="payment-option">
+                  <input type="radio" name="pay" value="gpay" onChange={(e)=>setPayment(e.target.value)} /> Google Pay (GPay)
+                </label>
+                <label className="payment-option">
+                  <input type="radio" name="pay" value="cod" onChange={(e)=>setPayment(e.target.value)} /> Cash on Delivery
+                </label>
+              </div>
+
+              <div style={{marginTop:12}}>
+                <button className="btn" onClick={proceed}>Proceed to Checkout</button>
+                <button className="btn btn-sm" onClick={clearCart} style={{marginLeft:8}}>Clear Cart</button>
+              </div>
+            </aside>
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
