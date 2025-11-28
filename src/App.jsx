@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import NavBar from "./components/NavBar";
+import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
 import Home from "./pages/Home";
@@ -13,25 +13,33 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 
 export default function App() {
+  // cart: array of { id, name, price, img, desc, qty }
   const [cart, setCart] = useState([]);
-  const [lastOrder, setLastOrder] = useState(null);
 
   const addToCart = (cake) => {
-    setCart(prev => {
-      const found = prev.find(p => p.id === cake.id);
-      if (found) return prev.map(p => p.id === cake.id ? { ...p, qty: p.qty + 1 } : p);
+    setCart((prev) => {
+      const found = prev.find((p) => p.id === cake.id);
+      if (found) {
+        return prev.map((p) =>
+          p.id === cake.id ? { ...p, qty: p.qty + 1 } : p
+        );
+      }
       return [...prev, { ...cake, qty: 1 }];
     });
   };
 
-  const updateQty = (id, delta) => {
-    setCart(prev => prev
-      .map(p => p.id === id ? { ...p, qty: Math.max(1, p.qty + delta) } : p)
-      .filter(p => p.qty > 0)
-    );
-  };
+  const increaseQty = (id) =>
+    setCart((prev) => prev.map((p) => (p.id === id ? { ...p, qty: p.qty + 1 } : p)));
 
-  const removeItem = (id) => setCart(prev => prev.filter(p => p.id !== id));
+  const decreaseQty = (id) =>
+    setCart((prev) =>
+      prev
+        .map((p) => (p.id === id ? { ...p, qty: Math.max(1, p.qty - 1) } : p))
+        .filter((p) => p.qty > 0)
+    );
+
+  const removeItem = (id) => setCart((prev) => prev.filter((p) => p.id !== id));
+
   const clearCart = () => setCart([]);
 
   const placeOrder = (customer) => {
@@ -40,25 +48,30 @@ export default function App() {
       items: cart,
       total: cart.reduce((s, i) => s + i.price * i.qty, 0),
       customer,
-      date: new Date().toLocaleString()
+      date: new Date().toLocaleString(),
     };
-    setLastOrder(order);
     clearCart();
     return order;
   };
 
   return (
     <Router>
-      <NavBar cartCount={cart.reduce((s,i)=>s+i.qty,0)} />
+      <Navbar cartCount={cart.reduce((s,i)=>s+i.qty,0)} />
       <main>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/shop" element={<Shop addToCart={addToCart} />} />
           <Route path="/cart" element={
-            <Cart cart={cart} updateQty={updateQty} addToCart={addToCart} removeItem={removeItem} clearCart={clearCart} />
+            <Cart
+              cart={cart}
+              increaseQty={increaseQty}
+              decreaseQty={decreaseQty}
+              removeItem={removeItem}
+              clearCart={clearCart}
+            />
           } />
           <Route path="/checkout" element={<Checkout cart={cart} placeOrder={placeOrder} />} />
-          <Route path="/confirmation" element={<Confirmation order={lastOrder} />} />
+          <Route path="/confirmation" element={<Confirmation />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
@@ -67,3 +80,4 @@ export default function App() {
     </Router>
   );
 }
+
