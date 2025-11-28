@@ -1,33 +1,33 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 
-export default function Confirmation({ order }) {
+export default function Confirmation() {
   const loc = useLocation();
-  const ord = order || (loc.state && loc.state.order);
+  const order = loc.state && loc.state.order;
 
-  if (!ord) {
+  if (!order) {
     return (
-      <div className="container page confirmation-page">
-        <h2>Order</h2>
-        <p>No recent order found. Go back to <Link to="/shop">Shop</Link>.</p>
-      </div>
+      <section className="page">
+        <h2 className="page-title">No Order Found</h2>
+        <div className="card" style={{padding:20, textAlign:'center'}}>
+          <p>No recent order. <Link to="/shop">Go to Shop</Link></p>
+        </div>
+      </section>
     );
   }
 
   return (
-    <div className="container page confirmation-page">
-      <h2 className="section-heading">Order Confirmed</h2>
-      <div className="order-card">
-        <p><strong>Order ID:</strong> {ord.id}</p>
-        <p><strong>Name:</strong> {ord.customer?.name}</p>
-        <p><strong>Phone:</strong> {ord.customer?.phone}</p>
-        <p><strong>Address:</strong> {ord.customer?.address}</p>
-        <p><strong>Total:</strong> ₹{ord.total}</p>
-        <p><strong>Date:</strong> {ord.date}</p>
-      </div>
+    <section className="page">
+      <h2 className="page-title">Order Confirmed</h2>
 
-      <Link to="/" className="btn">Back to Home</Link>
-    </div>
+      <div className="card" style={{padding:20}}>
+        <p><strong>Order ID:</strong> {order.id}</p>
+        <p><strong>Name:</strong> {order.customer.name}</p>
+        <p><strong>Total:</strong> ₹{order.total}</p>
+        <p><strong>Date:</strong> {order.date}</p>
+      </div>
+    </section>
   );
 }
+
 
