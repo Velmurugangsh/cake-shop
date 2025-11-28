@@ -1,16 +1,21 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function NavBar({ cartCount = 0 }) {
+export default function Navbar({ cartCount = 0 }) {
   return (
-    <header className="rg-nav">
-      <div className="rg-brand">
-        <Link to="/" className="brand-link">
-          <span className="brand-serif">Syntx</span><span className="brand-sans">Cakes</span>
+    <header className="navbar">
+      <div className="nav-left">
+        <Link to="/" className="logo">
+          <div className="logo-bubble">SC</div>
+          <div className="brand">
+            <div className="brand-name">Syntx Cakes</div>
+            <div className="brand-tag">Baking Happiness</div>
+          </div>
         </Link>
       </div>
 
-      <nav className="rg-links">
+      <nav className="nav-right">
+        <Link to="/">Home</Link>
         <Link to="/shop">Shop</Link>
         <Link to="/about">About</Link>
         <Link to="/contact">Contact</Link>
