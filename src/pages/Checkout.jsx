@@ -1,36 +1,35 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-export default function Checkout({ cart = [], placeOrder }){
+export default function Checkout({ cart = [], placeOrder }) {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name:"", phone:"", address:"" });
+  const location = useLocation();
+  const [form, setForm] = useState({ name: "", phone: "", address: "" });
 
-  const handle = (e) => setForm({...form, [e.target.name]: e.target.value });
+  const total = cart.reduce((s,i)=> s + i.price * i.qty, 0);
 
-  const submit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.address) return alert("Fill all fields");
+    if (!form.name || !form.phone || !form.address) { alert("Fill all fields"); return; }
     const order = placeOrder ? placeOrder(form) : null;
-    navigate('/confirmation', { state: { order } });
+    navigate("/confirmation", { state: { order } });
   };
 
-  const total = cart.reduce((s,c) => s + c.price * c.qty, 0);
-
   return (
-    <div className="container page checkout-page">
-      <h2 className="section-heading">Checkout</h2>
-      <form className="checkout-form" onSubmit={submit}>
-        <label>Name<input name="name" value={form.name} onChange={handle} required/></label>
-        <label>Phone<input name="phone" value={form.phone} onChange={handle} required/></label>
-        <label>Address<textarea name="address" value={form.address} onChange={handle} rows="4" required/></label>
+    <section className="checkout page">
+      <h2 className="page-title">Checkout</h2>
 
-        <div className="checkout-summary">
-          <div>Items: {cart.reduce((s,i)=>s+i.qty,0)}</div>
-          <div>Total: ₹{total}</div>
-        </div>
+      <div className="checkout card">
+        <form onSubmit={handleSubmit} className="checkout-form">
+          <label>Name<input value={form.name} onChange={(e)=>setForm({...form, name:e.target.value})} required /></label>
+          <label>Phone<input value={form.phone} onChange={(e)=>setForm({...form, phone:e.target.value})} required /></label>
+          <label>Address<textarea value={form.address} onChange={(e)=>setForm({...form, address:e.target.value})} required rows={4} /></label>
 
-        <button className="btn primary" type="submit">Place Order</button>
-      </form>
-    </div>
+          <div style={{marginTop:12}}><strong>Total: ₹{total}</strong></div>
+
+          <button className="btn" type="submit" style={{marginTop:12}}>Place Order</button>
+        </form>
+      </div>
+    </section>
   );
 }
